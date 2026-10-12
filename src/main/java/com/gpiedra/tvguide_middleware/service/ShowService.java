@@ -26,4 +26,7 @@ public class ShowService {
                 .map(showMapper::toResponse)
                 .toList();
     }
+    public ShowResponse getById(long id) {
+    return showMapper.toResponse(tvClient.getShow(id));
+}
 }

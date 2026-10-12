@@ -1,6 +1,8 @@
 package com.gpiedra.tvguide_middleware.client;
 
 import com.gpiedra.tvguide_middleware.dto.TvMazeSearchItem;
+import com.gpiedra.tvguide_middleware.dto.TvMazeShow;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -25,5 +27,12 @@ public class TvClient {
                 .retrieve()
                 .body(SEARCH_RESULT);
         return results == null ? List.of() : results;
+    }
+
+    public TvMazeShow getShow(long id) {
+    return restClient.get()
+            .uri("/shows/{id}", id)
+            .retrieve()
+            .body(TvMazeShow.class);
     }
 }
