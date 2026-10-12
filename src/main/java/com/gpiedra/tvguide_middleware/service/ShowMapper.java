@@ -4,6 +4,8 @@ import com.gpiedra.tvguide_middleware.dto.ShowResponse;
 import com.gpiedra.tvguide_middleware.dto.TvMazeShow;
 import org.springframework.stereotype.Component;
 
+import com.gpiedra.tvguide_middleware.model.ShowDocument;
+
 import java.util.List;
 
 @Component
@@ -31,5 +33,25 @@ public class ShowMapper {
 
     private boolean hasText(String value) {
         return value != null && !value.isBlank();
+    }
+
+    public ShowDocument toDocument(ShowResponse response) {
+    return new ShowDocument(
+            response.id(),
+            response.name(),
+            response.channel(),
+            response.summary(),
+            response.genres() == null ? List.of() : List.copyOf(response.genres())
+        );
+    }
+
+    public ShowResponse fromDocument(ShowDocument document) {
+        return new ShowResponse(
+                document.id(),
+                document.name(),
+                document.channel(),
+                document.summary(),
+                document.genres() == null ? List.of() : List.copyOf(document.genres())
+        );
     }
 }

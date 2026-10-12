@@ -4,6 +4,7 @@ import com.gpiedra.tvguide_middleware.client.TvClient;
 import com.gpiedra.tvguide_middleware.dto.ShowResponse;
 import com.gpiedra.tvguide_middleware.dto.TvMazeSearchItem;
 import org.springframework.stereotype.Service;
+import com.gpiedra.tvguide_middleware.repository.ShowRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,10 +14,12 @@ public class ShowService {
 
     private final TvClient tvClient;
     private final ShowMapper showMapper;
+    private final ShowRepository showRepository;
 
-    public ShowService(TvClient tvClient, ShowMapper showMapper) {
+    public ShowService(TvClient tvClient, ShowMapper showMapper, ShowRepository showRepository) {
         this.tvClient = tvClient;
         this.showMapper = showMapper;
+        this.showRepository = showRepository;
     }
 
     public List<ShowResponse> search(String searchQuery) {
@@ -26,7 +29,16 @@ public class ShowService {
                 .map(showMapper::toResponse)
                 .toList();
     }
+
     public ShowResponse getById(long id) {
-    return showMapper.toResponse(tvClient.getShow(id));
-}
+        return showRepository.findById(id)
+                .map(showMapper::fromDocument)
+                .orElseGet(() -> fetchAndStore(id));
+    }
+
+    private ShowResponse fetchAndStore(long id) {
+        ShowResponse response = showMapper.toResponse(tvClient.getShow(id));
+        showRepository.save(showMapper.toDocument(response));
+        return response;
+    }
 }
