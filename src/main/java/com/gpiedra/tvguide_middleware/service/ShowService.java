@@ -15,11 +15,13 @@ public class ShowService {
     private final TvClient tvClient;
     private final ShowMapper showMapper;
     private final ShowRepository showRepository;
+    private final CommentService commentService;
 
-    public ShowService(TvClient tvClient, ShowMapper showMapper, ShowRepository showRepository) {
+    public ShowService(TvClient tvClient, ShowMapper showMapper, ShowRepository showRepository, CommentService commentService) {
         this.tvClient = tvClient;
         this.showMapper = showMapper;
         this.showRepository = showRepository;
+        this.commentService = commentService;
     }
 
     public List<ShowResponse> search(String searchQuery) {
@@ -27,18 +29,32 @@ public class ShowService {
                 .map(TvMazeSearchItem::show)
                 .filter(Objects::nonNull)
                 .map(showMapper::toResponse)
+                .map(this::withComments)
                 .toList();
     }
 
     public ShowResponse getById(long id) {
-        return showRepository.findById(id)
+        ShowResponse show = showRepository.findById(id)
                 .map(showMapper::fromDocument)
                 .orElseGet(() -> fetchAndStore(id));
+        return withComments(show);
     }
+
 
     private ShowResponse fetchAndStore(long id) {
         ShowResponse response = showMapper.toResponse(tvClient.getShow(id));
         showRepository.save(showMapper.toDocument(response));
         return response;
+    }
+
+    private ShowResponse withComments(ShowResponse show) {
+        return new ShowResponse(
+                show.id(),
+                show.name(),
+                show.channel(),
+                show.summary(),
+                show.genres(),
+                commentService.findByShowId(show.id())
+        );
     }
 }

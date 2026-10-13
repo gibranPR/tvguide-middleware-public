@@ -17,7 +17,8 @@ public class ShowMapper {
                 show.name(),
                 channelOf(show),
                 show.summary(),
-                show.genres() == null ? List.of() : List.copyOf(show.genres())
+                show.genres() == null ? List.of() : List.copyOf(show.genres()),
+                List.of()
         );
     }
 
@@ -51,7 +52,8 @@ public class ShowMapper {
                 document.name(),
                 document.channel(),
                 document.summary(),
-                document.genres() == null ? List.of() : List.copyOf(document.genres())
+                document.genres() == null ? List.of() : List.copyOf(document.genres()),
+                List.of()
         );
     }
 }

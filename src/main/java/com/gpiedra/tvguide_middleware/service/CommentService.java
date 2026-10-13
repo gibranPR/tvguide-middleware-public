@@ -3,6 +3,9 @@ package com.gpiedra.tvguide_middleware.service;
 import com.gpiedra.tvguide_middleware.dto.*;
 import com.gpiedra.tvguide_middleware.model.*;
 import com.gpiedra.tvguide_middleware.repository.*;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -23,4 +26,9 @@ public class CommentService {
         commentRepository.save(document);
         return new CommentStatusResponse(HttpStatus.CREATED.value());
     }
+    public List<CommentItem> findByShowId(long showId) {
+    return commentRepository.findByShowIdOrderByIdAsc(showId).stream()
+            .map(document -> new CommentItem(document.getComment(), document.getRating()))
+            .toList();
+}
 }
